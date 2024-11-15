@@ -50,6 +50,13 @@ func NewServer() *Server {
 		s.clients[channel][id] = &Client{
 			ch: ch,
 		}
+
+		// Always send current value upon connection
+		if val, exists := s.gauges[channel]; exists {
+			go func() {
+				ch <- val
+			}()
+		}
 		s.mut.Unlock()
 
 		printJson(s.clients)
